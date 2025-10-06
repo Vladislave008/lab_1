@@ -1,12 +1,15 @@
-class Token:
-    def __init__(self, type_, value=None):
-        self.type = type_
-        self.value = value
+from calculator_M1 import Calculator # type: ignore
 
 def main() -> None:
-    """
-    Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
-    :return: Данная функция ничего не возвращает
-    """
+    calc = Calculator()
+    while True:
+        expr = str(input('Write your expression: '))
+        if expr.lower() in ['stop', 'end', 'finish', 'done', 'q']:
+            break
+        else:
+            try:
+                print(calc.evaluate(expr))
+            except Exception as e:
+                print(f"{'\033[91m'}{'\033[1m'}Error: {'\033[0m'}{'\033[91m'}{e}{'\033[0m'}")
 if __name__ == "__main__":
     main()
