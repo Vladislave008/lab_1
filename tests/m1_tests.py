@@ -29,7 +29,7 @@ def test_multiplication_and_division_priority():
     assert calc.evaluate('4+6*2-10/5') == 14
 
 def test_braces_priority():
-    ''' Тест изменения приоритета операций с помощью скобок '''
+    ''' Тест изменения приоритета операций при помощи скобок '''
     calc = Calculator()
     assert calc.evaluate('(2+3)*4') == 20
     assert calc.evaluate('2*(3+4)') == 14
@@ -97,12 +97,14 @@ def test_error_cases():
         calc.evaluate('5//0')
     with pytest.raises(ZeroDivisionError):
         calc.evaluate('10%0')
-    with pytest.raises(SyntaxError, match = 'Mod operation with float'):
+    with pytest.raises(ValueError, match = 'Mod operation with float'):
         calc.evaluate('(2.5+1.5)%(1.0+0.2)')
-    with pytest.raises(SyntaxError, match = 'Floor division with float'):
+    with pytest.raises(ValueError, match = 'Floor division with float'):
         calc.evaluate('(2//4.3)')
     with pytest.raises(ValueError, match='Too big operand for pow'):
         calc.evaluate('2**10**6')
+    with pytest.raises(ValueError, match='Unable to perform some operations with complex-typed values'):
+        calc.evaluate('((-1)**0.5)//2')
 
 
 def test_warning_cases():

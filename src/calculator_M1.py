@@ -16,6 +16,7 @@ class Calculator():
     def __init__(self):
         self.ind: int = 0 # global index of the current token which is being processed is stored there
         self.tokens: list[Token] = [] # the original expression converted in a list of tokens is stored there
+        warnings.simplefilter('always')
 
     def tokenize(self, expr: str) -> list[Token]:
         ''' Creates a list of Token objects out of given string
@@ -57,7 +58,9 @@ class Calculator():
                         raise SyntaxError('Too many dots in float')
                     i+=1
                 i-=1
-                if digit_buffer.startswith('.'):
+                if digit_buffer == '.':
+                    raise SyntaxError('Bad input format')
+                elif digit_buffer.startswith('.'):
                     digit_buffer = '0' + digit_buffer
                 elif digit_buffer.endswith('.'):
                     digit_buffer += '0'
@@ -84,6 +87,7 @@ class Calculator():
 
     def tokens_correct(self):
         ''' Raises warning or SyntaxError if current list of tokens contains mistakes '''
+        show_warn: bool = False # used to store information about the need of a warning
         for i in range(1, len(self.tokens)):
             if (self.tokens[i].type == NUM and self.tokens[i-1].type == NUM) or (self.tokens[i].value == '(' and self.tokens[i-1].value == ')') or \
             (self.tokens[i].value == '(' and self.tokens[i-1].type == NUM) or (self.tokens[i].type == NUM and self.tokens[i-1].value == ')'):
@@ -93,12 +97,14 @@ class Calculator():
                 left = self.tokens[i-1].value
                 if (left in ['+', '-'] and right in ['/', '//', '*', '**', '%']) or (left in ['/', '//', '*', '**', '%'] and right in ['/', '//', '*', '**', '%']):
                     raise SyntaxError('A few operators in a row')
-                warnings.warn('A few operators in a row')
+                show_warn = True
+        if show_warn:
+            warnings.warn('A few operators in a row')
 
     def evaluate(self, expr: str) -> int | float | complex: # complex example: '(-1)**0.5' = (6.123233995736766e-17+1j)
         ''' Main function which returns the result of the given expression
             Args:
-                Expr: string expression
+                expr: string expression
             Returns:
                 Result of the expression (possible types: int/float/complex)
             Might throw:
@@ -174,7 +180,7 @@ class Calculator():
                 Value of the current multiplicative operation (or a few multiplicative operations, if they are in a row)
             Might throw:
                 ZeroDivisionError: if a division by zero appears
-                SyntaxError: if a mod/floor division with a float operand appears '''
+                ValueError: if a mod/floor division with a float/complex operand appears '''
         res = self.pow()
         while self.ind < len(self.tokens) and self.tokens[self.ind].value in ['*','/','//','%','**']:
             operator = self.tokens[self.ind]
@@ -188,19 +194,19 @@ class Calculator():
                 res /= rvalue
             elif operator.value == '//':
                 if isinstance(rvalue, complex) or isinstance(res,complex):
-                    raise SyntaxError('Unable to perform some operations with complex-typed values')
+                    raise ValueError('Unable to perform some operations with complex-typed values')
                 if rvalue == 0:
                     raise ZeroDivisionError('Division by zero')
                 elif rvalue % 1 != 0 or res % 1 != 0:
-                    raise SyntaxError('Floor division with float appeared')
+                    raise ValueError('Floor division with float appeared')
                 res = int(res) // int(rvalue)
             elif operator.value == '%':
                 if isinstance(rvalue, complex) or isinstance(res,complex):
-                    raise SyntaxError('Unable to perform some operations with complex-typed values')
+                    raise ValueError('Unable to perform some operations with complex-typed values')
                 if rvalue == 0:
                     raise ZeroDivisionError('Division by zero')
                 elif rvalue % 1 != 0 or res % 1 != 0:
-                    raise SyntaxError('Mod operation with float appeared')
+                    raise ValueError('Mod operation with float appeared')
                 res = int(res) % int(rvalue)
         return res
 
