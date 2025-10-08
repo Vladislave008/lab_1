@@ -1,7 +1,4 @@
-import sys
-import os
 import warnings
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.constants import NUM, OPER, BRACE
 
 

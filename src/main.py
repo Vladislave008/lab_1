@@ -1,4 +1,4 @@
-from calculator_M1 import Calculator # type: ignore
+from src.calculator_M1 import Calculator
 
 def main() -> None:
     calc = Calculator()

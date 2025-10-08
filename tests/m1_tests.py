@@ -1,8 +1,5 @@
-import sys
-import os
-import pytest # type: ignore
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.calculator_M1 import Calculator # type: ignore
+import pytest
+from src.calculator_M1 import Calculator
 
 def test_unary_operators_priority():
     ''' Тест приоритета унарных операторов над другими операциями '''
